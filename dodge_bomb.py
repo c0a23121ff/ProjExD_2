@@ -48,6 +48,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        if kk_rct.colliderect(bb_rct):
+            print("GAME OVER")
+            return #ゲームオーバー
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
@@ -76,6 +79,7 @@ def main():
         if not tate: #上下の壁にぶつかったら反転
             vy *= -1
         screen.blit(bb_img, bb_rct)
+        
         pg.display.update()
         tmr += 1
         clock.tick(50)
