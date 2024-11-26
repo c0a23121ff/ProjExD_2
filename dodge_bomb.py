@@ -11,6 +11,8 @@ WIDTH, HEIGHT = 1100, 650
 DELTA = {pg.K_UP: (0, -5), pg.K_DOWN: (0, 5),
         pg.K_LEFT: (-5, 0), pg.K_RIGHT: (5, 0),}
 
+
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -62,6 +64,20 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     return bb_imgs, accs
 
+#押下キーに対する移動量の合計値タプルをキー，rotozoomしたSurfaceを値とした辞書を準備する
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    引数:押下キーに対する移動量の合計値タプル
+    戻り値:rotozoomしたSurface
+    """
+    # kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    if sum_mv == (0, 0):
+        pass
+    if sum_mv == (0, -5):
+        kk_img = pg.transform.flip(pg.image.load("fig/3.png"), False, True)
+    return kk_img
+    
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -80,8 +96,6 @@ def main():
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) # 爆弾の初期位置
     bb_img.set_colorkey((0, 0, 0)) # 四隅の黒色を透明化
     
-    
-
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -114,6 +128,7 @@ def main():
         bb_img = bb_imgs[min(tmr//500, 9)]
         avx = vx*bb_accs[min(tmr//500, 9)]
         avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_rct.width, bb_rct.height = bb_img.get_size()
         bb_rct.move_ip(avx, avy)
         yoko, tate = check_bound(bb_rct)
         if not yoko: #左右の壁にぶつかったら反転
@@ -121,7 +136,8 @@ def main():
         if not tate: #上下の壁にぶつかったら反転
             vy *= -1
         screen.blit(bb_img, bb_rct)
-        
+        kk_img = get_kk_img((0,0))
+        kk_img = get_kk_img(tuple(sum_mv))
         pg.display.update()
         tmr += 1 #タイマーを1増やす
         clock.tick(50) #フレームレートを指定
