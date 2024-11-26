@@ -13,13 +13,27 @@ DELTA = {pg.K_UP: (0, -5), pg.K_DOWN: (0, 5),
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def check_bound(rct : pg.Rect) -> tuple[bool, bool]:
+    """
+    引数:こうかとんRectかばくだんRect
+    戻り値:左右の壁にぶつかっているか、上下の壁にぶつかっているかを表すbool値のタプル
+    画面内に収まっている場合はTrue、画面外に出ている場合はFalseを返す
+    """
+    yoko = True
+    tate = True
+    if rct.left < 0 or WIDTH < rct.right: #横方向判定
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom: #縦方向判定
+        tate = False
+    return yoko, tate
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
-    kk_rct.center = 900, 400
+    kk_rct.center = 300, 200
     clock = pg.time.Clock()
     tmr = 0
 
@@ -29,8 +43,6 @@ def main():
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) # 爆弾の初期位置
     bb_img.set_colorkey((0, 0, 0)) # 四隅の黒色を透明化
     vx, vy = +5, +5
-
-    
 
     while True:
         for event in pg.event.get():
@@ -53,8 +65,16 @@ def main():
         # if key_lst[pg.K_RIGHT]:
         #     sum_mv = DELTA[pg.K_RIGHT]
         kk_rct.move_ip(sum_mv)
+        #こうかとんが画面外なら、元の場所に戻す
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip([-sum_mv[0], -sum_mv[1]])
         screen.blit(kk_img, kk_rct)
         bb_rct.move_ip(vx, vy)
+        yoko, tate = check_bound(bb_rct)
+        if not yoko: #左右の壁にぶつかったら反転
+            vx *= -1
+        if not tate: #上下の壁にぶつかったら反転
+            vy *= -1
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
