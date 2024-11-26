@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 import pygame as pg
 
@@ -22,7 +23,13 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
 
-    
+    bb_img = pg.Surface((20, 20)) # 爆弾用のSurfaceを生成
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10) # 赤い丸を描画
+    bb_rct = bb_img.get_rect() # 爆弾rectを取得
+    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) # 爆弾の初期位置
+    bb_img.set_colorkey((0, 0, 0)) # 四隅の黒色を透明化
+    vx, vy = +5, +5
+
     
 
     while True:
@@ -47,6 +54,8 @@ def main():
         #     sum_mv = DELTA[pg.K_RIGHT]
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
+        bb_rct.move_ip(vx, vy)
+        screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
         clock.tick(50)
