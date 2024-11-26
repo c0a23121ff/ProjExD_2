@@ -70,11 +70,13 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     引数:押下キーに対する移動量の合計値タプル
     戻り値:rotozoomしたSurface
     """
-    # kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     if sum_mv == (0, 0):
         pass
+    if sum_mv == (5, 0):
+        kk_img = pg.transform.flip(kk_img, True, False)
     if sum_mv == (0, -5):
-        kk_img = pg.transform.flip(pg.image.load("fig/3.png"), False, True)
+        kk_img = pg.transform.rotozoom(kk_img, 270, 0.9)
     return kk_img
     
 
@@ -125,11 +127,11 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip([-sum_mv[0], -sum_mv[1]])
         screen.blit(kk_img, kk_rct)
-        bb_img = bb_imgs[min(tmr//500, 9)]
-        avx = vx*bb_accs[min(tmr//500, 9)]
-        avy = vy*bb_accs[min(tmr//500, 9)]
-        bb_rct.width, bb_rct.height = bb_img.get_size()
-        bb_rct.move_ip(avx, avy)
+        bb_img = bb_imgs[min(tmr//500, 9)] # 爆弾の画像を取得
+        avx = vx*bb_accs[min(tmr//500, 9)] # 爆弾の速度を取得
+        avy = vy*bb_accs[min(tmr//500, 9)] # 爆弾の速度を取得
+        bb_rct.width, bb_rct.height = bb_img.get_size() # 爆弾のサイズを取得
+        bb_rct.move_ip(avx, avy) 
         yoko, tate = check_bound(bb_rct)
         if not yoko: #左右の壁にぶつかったら反転
             vx *= -1
